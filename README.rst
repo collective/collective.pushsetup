@@ -6,9 +6,10 @@ Setup
 -----
 1. Create local repostiory as proxy to destination repository
 2. Configure settings (by now in src/collective/pushsetup/pushsetup.py)
-   * PLONE_SITE: Name of plone site to acquire state from
-   * PLONE_USER: User to be used for state aquisition
-   * REPO_PATH: Path to local repository created in step 1
+
+   1. PLONE_SITE: Name of plone site to acquire state from
+   2. PLONE_USER: User to be used for state aquisition
+   3. REPO_PATH: Path to local repository created in step 1
 
 Execution
 ---------
