@@ -9,7 +9,7 @@ from zope.component.hooks import setSite
 
 
 REPO_PATH = "~/config/"
-PLONE_USER = "bernp"
+PLONE_USER = "admin"
 PLONE_SITE = "pcp"
 
 
@@ -36,7 +36,7 @@ def getSite(app, site_id, admin_id):
 def main(app):
     try:
         site = getSite(app, PLONE_SITE, PLONE_USER)
-        stool = queryUtility(ISetupTool)
+        stool = site.portal_setup
 
         result = stool.runAllExportSteps()
         tarball = result['tarball']
