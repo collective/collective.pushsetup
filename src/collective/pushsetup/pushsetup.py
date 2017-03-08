@@ -1,14 +1,13 @@
 import tarfile
 import git
+import StringIO
 
-from Products.GenericSetup.interfaces import ISetupTool
-from zope.component import queryUtility
 from AccessControl.SecurityManagement import newSecurityManager
 from Testing import makerequest
 from zope.component.hooks import setSite
 
 
-REPO_PATH = "~/config/"
+REPO_PATH = "/home/bernhard/local/config/"
 PLONE_USER = "admin"
 PLONE_SITE = "pcp"
 
@@ -39,7 +38,7 @@ def main(app):
         stool = site.portal_setup
 
         result = stool.runAllExportSteps()
-        tarball = result['tarball']
+        tarball = StringIO.StringIO(result['tarball'])
 
         # access repository (master branch)
         repository = git.Repo(REPO_PATH)
@@ -50,7 +49,8 @@ def main(app):
             archive.extractall(REPO_PATH)
 
         # commit all changes to local repository
-        repository.git.commit('-a', '-m', 'update config dump')
+        repository.git.add('--all')
+        repository.git.commit('-m', 'update config dump')
 
         # push commit to remote repository
         repository.remotes['origin'].push()
