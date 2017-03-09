@@ -67,7 +67,7 @@ def main(app):
 
         # commit all changes to local repository
         repository.git.add('--all')
-        repository.git.commit('-m', 'update config dump')
+        repository.git.commit('--allow-empty', '-m', 'update config dump')
 
         # push commit to remote repository
         repository.remotes['origin'].push()
