@@ -1,3 +1,4 @@
+import argparse
 import tarfile
 import git
 import StringIO
@@ -5,11 +6,6 @@ import StringIO
 from AccessControl.SecurityManagement import newSecurityManager
 from Testing import makerequest
 from zope.component.hooks import setSite
-
-
-REPO_PATH = "/home/bernhard/local/config/"
-PLONE_USER = "admin"
-PLONE_SITE = "pcp"
 
 
 def getSite(app, site_id, admin_id):
@@ -32,21 +28,42 @@ def getSite(app, site_id, admin_id):
     return site
 
 
+def makeArgParser():
+    parser = argparse.ArgumentParser(description='Acquire Plone site\'s Generic Setup state and push it '
+                                                 'to git repository via local proxy repository.'
+                                                 'Usage: bin/instance run <path-to-pushsetup.py> [args]')
+
+    parser.add_argument('--site', '-s', dest='site', default='Plone',
+                        help='Name of site whose state to push (default: Plone)')
+    parser.add_argument('--user', '-u', dest='user', default='admin',
+                        help='Username to acquire Generic Setup of site (default: admin)')
+    parser.add_argument('--local-repo', '-r', dest='repo',
+                        help='Proxy git repository to extract site\'s state to. Then pushed to origin.')
+
+    parser.add_argument('-c', default='',
+                        help='Do not use (required by Zope when executing this scipt)')
+
+    return parser
+
+
 def main(app):
     try:
-        site = getSite(app, PLONE_SITE, PLONE_USER)
+        parser = makeArgParser()
+        args = parser.parse_args()
+
+        site = getSite(app, args.site, args.user)
         stool = site.portal_setup
 
         result = stool.runAllExportSteps()
         tarball = StringIO.StringIO(result['tarball'])
 
         # access repository (master branch)
-        repository = git.Repo(REPO_PATH)
+        repository = git.Repo(args.repo)
         repository.git.checkout('master')
 
         # extract dump into repository
         with tarfile.open(fileobj=tarball, errorlevel=2) as archive:
-            archive.extractall(REPO_PATH)
+            archive.extractall(args.repo)
 
         # commit all changes to local repository
         repository.git.add('--all')
