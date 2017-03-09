@@ -92,6 +92,8 @@ def main(app):
     try:
         # extract dump into repository
         with tarfile.open(fileobj=tarball, errorlevel=2) as archive:
+            # The directory should already exist as we already opened the contained git repository.
+            # TODO: check for paths in archive that escape the repository's directory
             archive.extractall(args.repo)
     except tarfile.TarError as e:
         logger.exception('Failed extracting state to local repository')
