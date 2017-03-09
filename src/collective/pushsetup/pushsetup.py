@@ -56,7 +56,7 @@ def makeArgParser():
     parser.add_argument('--user', '-u', dest='user', default='admin',
                         help='Username to acquire Generic Setup of site (default: admin)')
     parser.add_argument('--local-repo', '-r', dest='repo',
-                        help='Proxy git repository to extract site\'s state to. Then pushed to origin.')
+                        help='Local proxy git repository to extract site\'s state to. Then push to origin.')
 
     parser.add_argument('-c', default='',
                         help='Do not use (required by Zope when executing this scipt)')
@@ -78,6 +78,8 @@ def main(app):
     result = stool.runAllExportSteps()
     tarball = StringIO.StringIO(result['tarball'])
 
+    logger.info('Checkout master branch of local repository and get origin repository')
+
     try:
         # access repository (master branch)
         repository = git.Repo(args.repo)
@@ -87,7 +89,29 @@ def main(app):
         logger.exception('Failed accessing local git repository')
         sys.exit(1)
 
-    logger.info("Extracting state into local repository '%s'", args.repo)
+    try:
+        # abort if local repository is not clean
+        if repository.head.commit.diff(None) != []:
+            logger.error('Found uncommitted changes to local repository. Expecting clean master branch')
+            sys.exit(1)
+    except git.GitCommandError as e:
+        logger.exception('Failed checking for uncommitted local changes')
+        sys.exit(1)
+
+    try:
+        # pull remote prepository in case it changed
+        changes = remote.pull()
+        assert len(changes) == 1
+
+        if (changes[0].flags & git.FetchInfo.HEAD_UPTODATE) != 0:
+            logger.info('Local repository is up-to-date')
+        else:
+            logger.info('Pulled changes from remote repository')
+    except git.GitCommandError as e:
+        logger.exception('Failed pulling from remote repository')
+        sys.exit(1)
+
+    logger.info("Extracting state to local repository '%s'", args.repo)
 
     try:
         # extract dump into repository
