@@ -4,7 +4,7 @@ Dump the entire state of a Plone site using Generic Setup
 
 Setup
 -----
-Create local repostiory as proxy to destination repository. 'Origin' remote repository
+Create local repostiory as proxy to destination repository.
 
 Usage
 -----
