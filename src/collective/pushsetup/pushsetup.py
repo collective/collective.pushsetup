@@ -4,6 +4,7 @@ import sys
 import logging
 import git
 import StringIO
+import os
 
 
 from AccessControl.SecurityManagement import newSecurityManager
@@ -47,16 +48,18 @@ def getLogger(logfilename='var/log/pushsetup.log'):
 
 
 def makeArgParser():
-    parser = argparse.ArgumentParser(description='Acquire Plone site\'s Generic Setup state and push it '
-                                                 'to git repository via local proxy repository.'
-                                                 'Usage: bin/instance run <path-to-pushsetup.py> [args]')
+    parser = argparse.ArgumentParser(usage='bin/instance run <path-to-pushsetup.py> '
+                                           '[--site SITE] [--user USER] repository',
+                                     description='Acquire Plone site\'s Generic Setup state and push it '
+                                                 'to git repository via local proxy repository')
 
-    parser.add_argument('--site', '-s', dest='site', default='Plone',
+    parser.add_argument('--site', dest='site', default='Plone',
                         help='Name of site whose state to push (default: Plone)')
-    parser.add_argument('--user', '-u', dest='user', default='admin',
+    parser.add_argument('--user', dest='user', default='admin',
                         help='Username to acquire Generic Setup of site (default: admin)')
-    parser.add_argument('--local-repo', '-r', dest='repo',
-                        help='Local proxy git repository to extract site\'s state to. Then push to origin.')
+    parser.add_argument('repo',
+                        help='Path to local proxy git repository to extract site\'s state to. '
+                             'Push changes to its origin.')
 
     parser.add_argument('-c', default='',
                         help='Do not use (required by Zope when executing this scipt)')
@@ -79,6 +82,9 @@ def main(app):
     tarball = StringIO.StringIO(result['tarball'])
 
     logger.info('Checkout master branch of local repository and get origin repository')
+
+    # enable user's home directory shortcut
+    args.repo = os.path.expanduser(args.repo)
 
     try:
         # access repository (master branch)
@@ -142,7 +148,7 @@ def main(app):
         logger.exception('Failed pushing changes to remote repository')
         sys.exit(1)
 
-    logger.info("Pushed Plone state to remote repository")
+    print "Pushed Plone state to remote repository"
 
 
 if "app" in locals():

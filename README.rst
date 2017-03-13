@@ -4,14 +4,20 @@ Dump the entire state of a Plone site using Generic Setup
 
 Setup
 -----
-1. Create local repostiory as proxy to destination repository
-2. Configure settings (by now in src/collective/pushsetup/pushsetup.py)
+Create local repostiory as proxy to destination repository. 'Origin' remote repository
 
-   1. PLONE_SITE: Name of plone site to acquire state from
-   2. PLONE_USER: User to be used for state aquisition
-   3. REPO_PATH: Path to local repository created in step 1
+Usage
+-----
+    usage: bin/instance run <path-to-pushsetup.py> [--site SITE] [--user USER] repository
 
-Execution
----------
-Run `bin/instance run <path-to-pushsetup.py>` to put all Generic Setup files
-into the local repository, commit and push to origin repository.
+    Acquire Plone site's Generic Setup state and push it to git repository via
+    local proxy repository.
+
+    positional arguments:
+      repo         Path to local proxy git repository to extract site's state to.  Push changes to its origin.
+
+    optional arguments:
+      -h, --help   show this help message and exit
+      --site SITE  Name of site whose state to push (default: Plone)
+      --user USER  Username to acquire Generic Setup of site (default: admin)
+      -c C         Do not use (required by Zope when executing this scipt)

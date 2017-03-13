@@ -33,7 +33,7 @@ setup(name='collective.pushsetup',
       # FIXME: Add more classifiers from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
           "Programming Language :: Python",
-          "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+          "License :: OSI Approved :: BSD License)"
           ],
       keywords='',  # FIXME: Add whatefer fits
       author='Bernhard Pöttinger',
